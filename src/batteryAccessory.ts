@@ -98,6 +98,10 @@ export class BatteryAccessory {
       this.accessory.addService(this.platform.Service.LightSensor, 'Grid Load', "Grid Load"))
         .setCharacteristic(this.platform.Characteristic.Name, "Grid Load")
 
+    const gridExportAsSensor = (this.accessory.getService('Grid Export') ||
+      this.accessory.addService(this.platform.Service.LightSensor, 'Grid Export', "Grid Export"))
+        .setCharacteristic(this.platform.Characteristic.Name, "Grid Export")
+
     const isFullySolarPoweredStatus = (this.accessory.getService('Fully Solar Powered') ||
       this.accessory.addService(this.platform.Service.ContactSensor, 'Fully Solar Powered', "FullySolarPowered"))
         .setCharacteristic(this.platform.Characteristic.Name, "Fully Solar Powered")
@@ -145,6 +149,7 @@ export class BatteryAccessory {
         pvPowerAsSensor.updateCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, plantStatus.pvPower > sensorMin ? plantStatus.pvPower : sensorMin) 
         propertyLoadAsSensor.updateCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, plantStatus.loadConsumption > sensorMin ? plantStatus.loadConsumption : sensorMin) 
         gridLoadAsSensor.updateCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, plantStatus.totalGridLoad > sensorMin ? plantStatus.totalGridLoad : sensorMin) 
+        gridExportAsSensor.updateCharacteristic(this.platform.Characteristic.CurrentAmbientLightLevel, plantStatus.exportGridLoad > sensorMin ? plantStatus.exportGridLoad : sensorMin) 
         isFullySolarPoweredStatus.updateCharacteristic(this.platform.Characteristic.ContactSensorState, plantStatus.isFullySolarPowered ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED) 
         highExportStatus.updateCharacteristic(this.platform.Characteristic.ContactSensorState, plantStatus.highExport ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED)
         highImportStatus.updateCharacteristic(this.platform.Characteristic.ContactSensorState, plantStatus.highImport ? this.platform.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED : this.platform.Characteristic.ContactSensorState.CONTACT_DETECTED)
@@ -227,10 +232,11 @@ export class BatteryAccessory {
               status: deviceStatus.status,
               ppv: Number(deviceStatus.ppv || 0),
               propertyConsumption: deviceStatus.pLocalLoad,
-              import: deviceStatus.pactouser
+              import: deviceStatus.pactouser,
+              export: deviceStatus.pactogrid
             }
 
-            //console.log(parameters)
+            //console.log(deviceStatus);
       
             const output : PlantStatus = {
               isChargingFromGrid: parameters.chargingPower > parameters.ppv ? true : false, // Returns true if the battery is charging from the grid
@@ -242,8 +248,9 @@ export class BatteryAccessory {
               pvPower: parameters.ppv,
               loadConsumption: parameters.propertyConsumption,
               totalGridLoad: parameters.import,
+              exportGridLoad: parameters.export,
               isFullySolarPowered: parameters.propertyConsumption <= parameters.ppv ? true : false,
-              highExport: parameters.import < -0.5 ? true : false,
+              highExport: parameters.export > 0.5 ? true : false,
               highImport: parameters.import > 2 ? true : false,
               exceedingInverterMax: parameters.propertyConsumption > 3 ? true : false
             }
@@ -286,6 +293,7 @@ type PlantStatus = {
   pvPower: number;
   loadConsumption: number;
   totalGridLoad: number;
+  exportGridLoad: number;
   isFullySolarPowered: boolean;
   highExport: boolean;
   highImport: boolean;

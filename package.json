@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Growatt API",
   "name": "homebridge-growatt-api",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Uses the Growatt API to expose the current inverter / battery status for automation.",
   "license": "Apache-2.0",
   "repository": {

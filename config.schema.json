@@ -1,15 +1,21 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "HomebridgeGrowattAPI",
   "pluginType": "platform",
   "singular": true,
   "schema": {
     "type": "object",
     "properties": {
-      "name": {
-        "title": "Name",
+      "user": {
+        "title": "user",
         "type": "string",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": "Growatt user"
+      },
+      "password": {
+        "title": "password",
+        "type": "string",
+        "required": true,
+        "default": "Growatt password"
       }
     }
   }
